@@ -32,10 +32,14 @@ st.sidebar.subheader("📄 Files in Vector Store")
 try:
     files = openai.files.list().data
     assistant_files = [f for f in files if f.purpose == "assistants"]
+    seen = set()
     if assistant_files:
         for f in assistant_files:
-            upload_time = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
-            st.sidebar.write(f"📁 {f.filename}\n🕒 {upload_time}")
+            if f.filename not in seen:
+                seen.add(f.filename)
+                upload_time = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
+                st.sidebar.write(f"📁 {f.filename}
+🕒 {upload_time}")
     else:
         st.sidebar.info("No files in vector store yet.")
 except Exception as e:
