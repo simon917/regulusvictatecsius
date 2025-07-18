@@ -36,7 +36,7 @@ if persist_files:
                 assistant_id=ASSISTANT_ID,
                 name=assistant_data.get("name"),
                 instructions=assistant_data.get("instructions"),
-                tools=assistant_data.get("tools", []),
+                tools=[tool.model_dump() for tool in assistant_data.get("tools", [])],
                 model=assistant_data.get("model"),
                 file_ids=updated_file_ids
             )
