@@ -36,11 +36,6 @@ if persist_files:
             openai.beta.vector_stores.file_batches.create(
                 vector_store_id=VECTORSTORE_ID,
                 file_ids=[uploaded.id]
-            ),
-                instructions=assistant_data.get("instructions"),
-                tools=assistant_data.get("tools", []),
-                model=assistant_data.get("model"),
-                file_ids=updated_file_ids
             )
             st.sidebar.success(f"Uploaded {file.name} to vector store. File ID: {uploaded.id}")
 
