@@ -1,6 +1,7 @@
 import streamlit as st
 import openai
 import os
+from datetime import datetime
 
 # Set your OpenAI API key
 openai.api_key = st.secrets["OPENAI_API_KEY"]
@@ -22,8 +23,23 @@ persist_files = st.sidebar.file_uploader("Upload PDFs for vector store", type=["
 
 if persist_files:
     for file in persist_files:
-        st.sidebar.success(f"Uploaded {file.name} to vector store.")
-        openai.files.create(file=file, purpose="assistants")
+        uploaded = openai.files.create(file=file, purpose="assistants")
+        st.sidebar.success(f"Uploaded {file.name} to vector store. File ID: {uploaded.id}")
+
+# Sidebar list of uploaded files
+st.sidebar.markdown("---")
+st.sidebar.subheader("📄 Files in Vector Store")
+try:
+    files = openai.files.list().data
+    assistant_files = [f for f in files if f.purpose == "assistants"]
+    if assistant_files:
+        for f in assistant_files:
+            upload_time = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
+            st.sidebar.write(f"📁 {f.filename}\n🕒 {upload_time}")
+    else:
+        st.sidebar.info("No files in vector store yet.")
+except Exception as e:
+    st.sidebar.error("Error retrieving file list.")
 
 # Temporary file uploads for one-off conversations
 st.subheader("💬 Chat with your Assistant")
