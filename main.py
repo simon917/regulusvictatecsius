@@ -7,7 +7,8 @@ from datetime import datetime
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Load Assistant ID from Streamlit secrets
-ASSISTANT_ID = st.secrets["ASSISTANT_ID"]  # Add this to your Streamlit Secrets
+ASSISTANT_ID = st.secrets["ASSISTANT_ID"]
+VECTORSTORE_ID = st.secrets["VECTORSTORE_ID"]  # Add this to your Streamlit Secrets
 
 st.set_page_config(page_title="Regulatory Assistant UI", layout="wide")
 st.title("📄 AI Regulatory Document Assistant")
@@ -32,9 +33,10 @@ if persist_files:
             assistant = openai.beta.assistants.retrieve(ASSISTANT_ID)
             assistant_data = assistant.model_dump()
             updated_file_ids = list(set(assistant_data.get("file_ids", []) + [uploaded.id]))
-            openai.beta.assistants.update(
-                assistant_id=ASSISTANT_ID,
-                name=assistant_data.get("name"),
+            openai.beta.vector_stores.file_batches.create(
+                vector_store_id=VECTORSTORE_ID,
+                file_ids=[uploaded.id]
+            ),
                 instructions=assistant_data.get("instructions"),
                 tools=assistant_data.get("tools", []),
                 model=assistant_data.get("model"),
