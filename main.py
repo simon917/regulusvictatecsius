@@ -38,8 +38,7 @@ try:
             if f.filename not in seen:
                 seen.add(f.filename)
                 upload_time = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
-                st.sidebar.write(f"{f.filename}
-{upload_time}")
+                st.sidebar.write(f"{f.filename} — {upload_time}")
     else:
         st.sidebar.info("No files in vector store yet.")
 except Exception as e:
