@@ -35,7 +35,7 @@ if persist_files:
 st.sidebar.markdown("---")
 st.sidebar.subheader("📄 Files in Vector Store")
 try:
-    vector_files = openai.beta.assistants.vector_stores.files.list(vector_store_id=VECTORSTORE_ID).data
+    vector_files = openai.beta.vector_stores.files.list(vector_store_id=VECTORSTORE_ID).data
     if vector_files:
         for f in vector_files:
             col1, col2 = st.sidebar.columns([4, 1])
