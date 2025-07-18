@@ -23,10 +23,9 @@ if persist_files:
     for file in persist_files:
         try:
             uploaded = openai.files.create(file=file, purpose="assistants")
-            openai.beta.vector_stores.file_batches.create(
-                vector_store_id=VECTORSTORE_ID,
-                file_ids=[uploaded.id]
-            )
+            if "vector_file_ids" not in st.session_state:
+                st.session_state.vector_file_ids = []
+            st.session_state.vector_file_ids.append(uploaded.id)
             st.sidebar.success(f"Uploaded: {file.name}")
         except Exception as e:
             st.sidebar.error(f"Upload failed: {e}")
@@ -35,13 +34,11 @@ if persist_files:
 
 # List vector store files
 st.sidebar.markdown("---")
-st.sidebar.subheader("📄 Files in Vector Store")
-try:
-    assistant = openai.beta.assistants.retrieve(ASSISTANT_ID)
-    file_ids = assistant.file_ids if hasattr(assistant, "file_ids") else []
-    vector_files = [openai.files.retrieve(fid) for fid in file_ids]
-    if vector_files:
-        for f in vector_files:
+st.sidebar.subheader("📄 Uploaded Files (Session)")
+if "vector_file_ids" in st.session_state and st.session_state.vector_file_ids:
+    for fid in st.session_state.vector_file_ids:
+        try:
+            f = openai.files.retrieve(fid)
             col1, col2 = st.sidebar.columns([4, 1])
             timestamp = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
             url = f"https://api.openai.com/v1/files/{f.id}/content"
@@ -52,13 +49,14 @@ try:
                     if st.sidebar.checkbox(f"Confirm delete: {f.filename}", key=f"cfm_{f.id}"):
                         try:
                             openai.files.delete(f.id)
+                            st.session_state.vector_file_ids.remove(fid)
                             st.experimental_rerun()
                         except Exception as e:
                             st.sidebar.error(f"Error deleting: {e}")
-    else:
-        st.sidebar.info("No files in vector store yet.")
-except Exception as e:
-    st.sidebar.error(f"Error loading files: {e}")
+        except Exception as e:
+            st.sidebar.warning(f"File not found: {fid}")
+else:
+    st.sidebar.info("No files uploaded in this session.")
 
 # Chat section
 st.subheader("💬 Chat with your Assistant")
