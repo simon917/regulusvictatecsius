@@ -23,7 +23,7 @@ if persist_files:
     for file in persist_files:
         try:
             uploaded = openai.files.create(file=file, purpose="assistants")
-            openai.beta.assistants.vector_stores.file_batches.create(
+            openai.beta.vector_stores.file_batches.create(
                 vector_store_id=VECTORSTORE_ID,
                 file_ids=[uploaded.id]
             )
