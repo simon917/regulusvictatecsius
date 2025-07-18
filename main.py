@@ -26,7 +26,7 @@ if persist_files:
     for file in persist_files:
         try:
             uploaded = openai.files.create(file=file, purpose="assistants")
-            openai.beta.vector_stores.file_batches.create(
+            openai.beta.assistants.vector_stores.file_batches.create(
                 vector_store_id=VECTORSTORE_ID,
                 file_ids=[uploaded.id]
             )
@@ -38,7 +38,7 @@ if persist_files:
 st.sidebar.markdown("---")
 st.sidebar.subheader("📄 Files in Vector Store")
 try:
-    vector_files = openai.beta.vector_stores.files.list(vector_store_id=VECTORSTORE_ID).data
+    vector_files = openai.beta.assistants.vector_stores.files.list(vector_store_id=VECTORSTORE_ID).data
     if vector_files:
         for f in vector_files:
             upload_time = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
