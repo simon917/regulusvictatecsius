@@ -58,9 +58,7 @@ try:
                             openai.files.delete(f.id)
                             st.experimental_rerun()
                         except Exception as e:
-                            st.sidebar.error(f"Error deleting {f.filename}")
-                    except Exception as e:
-                        st.sidebar.error(f"Error deleting {f.filename}")
+                            st.sidebar.error(f"Error deleting {f.filename}: {e}")
     else:
         st.sidebar.info("No files in vector store yet.")
 except Exception as e:
