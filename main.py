@@ -119,4 +119,3 @@ if user_input:
         st.session_state.messages.append({"role": "assistant", "content": last_message})
     else:
         st.error("Assistant failed to complete the request.")
-
