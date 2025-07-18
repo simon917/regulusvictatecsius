@@ -23,7 +23,7 @@ persist_files = st.sidebar.file_uploader("Upload PDFs for vector store", type=["
 if persist_files:
     for file in persist_files:
         st.sidebar.success(f"Uploaded {file.name} to vector store.")
-        openai.beta.files.create(file=file, purpose="assistants")
+        openai.files.create(file=file, purpose="assistants")
 
 # Temporary file uploads for one-off conversations
 st.subheader("💬 Chat with your Assistant")
