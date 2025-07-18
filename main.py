@@ -48,13 +48,17 @@ if user_input:
             upload = openai.files.create(file=file, purpose="assistants")
             file_ids.append(upload.id)
 
+    # Prepare message parameters
+    message_args = {
+        "thread_id": st.session_state.thread_id,
+        "role": "user",
+        "content": user_input
+    }
+    if file_ids:
+        message_args["file_ids"] = file_ids
+
     # Add user message to thread
-    openai.beta.threads.messages.create(
-        thread_id=st.session_state.thread_id,
-        role="user",
-        content=user_input,
-        file_ids=file_ids if file_ids else None  # Optional attachment
-    )
+    openai.beta.threads.messages.create(**message_args)
 
     with st.chat_message("user"):
         st.markdown(user_input)
