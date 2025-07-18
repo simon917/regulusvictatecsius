@@ -23,21 +23,16 @@ st.sidebar.header("📚 Add to Knowledge Base")
 persist_files = st.sidebar.file_uploader("Upload PDFs for vector store", type=["pdf"], accept_multiple_files=True)
 
 if persist_files:
-    existing_files = openai.files.list().data
-    existing_filenames = {f.filename for f in existing_files if f.purpose == "assistants"}
     for file in persist_files:
-        if file.name in existing_filenames:
-            st.sidebar.warning(f"{file.name} is already in the vector store.")
-        else:
+        try:
             uploaded = openai.files.create(file=file, purpose="assistants")
-            assistant = openai.beta.assistants.retrieve(ASSISTANT_ID)
-            assistant_data = assistant.model_dump()
-            updated_file_ids = list(set(assistant_data.get("file_ids", []) + [uploaded.id]))
             openai.beta.vector_stores.file_batches.create(
                 vector_store_id=VECTORSTORE_ID,
                 file_ids=[uploaded.id]
             )
-            st.sidebar.success(f"Uploaded {file.name} to vector store. File ID: {uploaded.id}")
+            st.sidebar.success(f"Uploaded {file.name} to vector store.")
+        except Exception as e:
+            st.sidebar.error(f"Error uploading {file.name}: {e}")
 
 # Sidebar list of uploaded files
 st.sidebar.markdown("---")
