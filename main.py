@@ -31,9 +31,10 @@ if persist_files:
             uploaded = openai.files.create(file=file, purpose="assistants")
             current_files = openai.beta.assistants.retrieve(ASSISTANT_ID).model_dump().get("file_ids", [])
             if uploaded.id not in current_files:
+                updated_files = list(set(current_files + [uploaded.id]))
                 openai.beta.assistants.update(
                     assistant_id=ASSISTANT_ID,
-                    file_ids=current_files + [uploaded.id]
+                    file_ids=updated_files
                 )
             st.sidebar.success(f"Uploaded {file.name} to vector store. File ID: {uploaded.id}")
 
