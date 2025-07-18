@@ -3,10 +3,10 @@ import openai
 import os
 
 # Set your OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
-# Assistant and thread setup
-ASSISTANT_ID = "your-assistant-id-here"  # Replace with your assistant ID
+# Load Assistant ID from Streamlit secrets
+ASSISTANT_ID = st.secrets["ASSISTANT_ID"]  # Add this to your Streamlit Secrets
 
 st.set_page_config(page_title="Regulatory Assistant UI", layout="wide")
 st.title("📄 AI Regulatory Document Assistant")
