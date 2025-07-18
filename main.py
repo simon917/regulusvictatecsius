@@ -28,7 +28,7 @@ if persist_files:
         if file.name in existing_filenames:
             st.sidebar.warning(f"{file.name} is already in the vector store.")
         else:
-            uploaded = openai.files.create(file=file, purpose="assistants")
+            uploaded = openai.files.create(file=file, purpose="fine-tune")
             st.sidebar.success(f"Uploaded {file.name} to vector store. File ID: {uploaded.id}")
 
 # Sidebar list of uploaded files
@@ -70,7 +70,7 @@ if user_input:
     if temp_files:
         for file in temp_files:
             try:
-                uploaded = openai.files.create(file=file, purpose="assistants")
+                uploaded = openai.files.create(file=file, purpose="fine-tune")
                 file_ids.append(uploaded.id)
             except Exception as e:
                 st.error(f"Failed to upload {file.name}: {e}")
@@ -119,3 +119,4 @@ if user_input:
         st.session_state.messages.append({"role": "assistant", "content": last_message})
     else:
         st.error("Assistant failed to complete the request.")
+
