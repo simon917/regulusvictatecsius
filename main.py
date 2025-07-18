@@ -23,24 +23,13 @@ if persist_files:
     for file in persist_files:
         try:
             uploaded = openai.files.create(file=file, purpose="assistants")
-            assistant = openai.beta.assistants.retrieve(ASSISTANT_ID)
-            tool_resources = assistant.model_dump().get("tool_resources", {})
-            current_files = tool_resources.get("file_search", {}).get("file_ids", [])
-
-            openai.beta.assistants.update(
-                assistant_id=ASSISTANT_ID,
-                name=assistant.name,
-                instructions=assistant.instructions,
-                tools=assistant.tools,
-                model=assistant.model,
-                tool_resources={
-                    "file_search": {
-                        "vector_store_ids": [VECTORSTORE_ID],
-                        "file_ids": list(set(current_files + [uploaded.id]))
-                    }
-                }
+            openai.beta.vector_stores.file_batches.create(
+                vector_store_id=VECTORSTORE_ID,
+                file_ids=[uploaded.id]
             )
             st.sidebar.success(f"Uploaded: {file.name}")
+        except Exception as e:
+            st.sidebar.error(f"Upload failed: {e}")
         except Exception as e:
             st.sidebar.error(f"Upload failed: {e}")
 
