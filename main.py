@@ -24,7 +24,9 @@ if persist_files:
         try:
             uploaded = openai.files.create(file=file, purpose="assistants")
             assistant = openai.beta.assistants.retrieve(ASSISTANT_ID)
-            current_files = assistant.model_dump().get("file_ids", [])
+            tool_resources = assistant.model_dump().get("tool_resources", {})
+            current_files = tool_resources.get("file_search", {}).get("file_ids", [])
+
             openai.beta.assistants.update(
                 assistant_id=ASSISTANT_ID,
                 name=assistant.name,
@@ -33,10 +35,10 @@ if persist_files:
                 model=assistant.model,
                 tool_resources={
                     "file_search": {
-                        "vector_store_ids": [VECTORSTORE_ID]
+                        "vector_store_ids": [VECTORSTORE_ID],
+                        "file_ids": list(set(current_files + [uploaded.id]))
                     }
-                },
-                file_ids=current_files + [uploaded.id]
+                }
             )
             st.sidebar.success(f"Uploaded: {file.name}")
         except Exception as e:
