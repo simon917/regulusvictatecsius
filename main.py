@@ -40,7 +40,7 @@ for msg in st.session_state.messages:
     with st.chat_message(msg["role"]):
         st.markdown(msg["content"])
 
-if user_input or temp_files:
+if user_input:
     # Attach files to thread if any
     file_ids = []
     if temp_files:
@@ -53,7 +53,7 @@ if user_input or temp_files:
         thread_id=st.session_state.thread_id,
         role="user",
         content=user_input,
-        file_ids=file_ids
+        file_ids=file_ids if file_ids else None  # Optional attachment
     )
 
     with st.chat_message("user"):
