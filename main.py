@@ -48,15 +48,24 @@ if persist_files:
 st.sidebar.markdown("---")
 st.sidebar.subheader("📄 Files in Vector Store")
 try:
-    files = openai.files.list().data
-    assistant_files = [f for f in files if f.purpose == "assistants"]
-    seen = set()
-    if assistant_files:
-        for f in assistant_files:
-            if f.filename not in seen:
-                seen.add(f.filename)
-                upload_time = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
-                st.sidebar.write(f"{f.filename} — {upload_time}")
+    vector_files = openai.beta.vector_stores.files.list(vector_store_id=VECTORSTORE_ID).data
+    if vector_files:
+        for f in vector_files:
+            upload_time = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
+            download_url = f"https://api.openai.com/v1/files/{f.id}/content"
+            col1, col2 = st.sidebar.columns([4, 1])
+            with col1:
+                st.markdown(f"[{f.filename} — {upload_time}]({download_url})")
+            with col2:
+                if st.button("🗑️", key=f"delete_{f.id}"):
+                    if st.sidebar.checkbox(f"Confirm delete: {f.filename}", key=f"confirm_{f.id}"):
+                        try:
+                            openai.files.delete(f.id)
+                            st.experimental_rerun()
+                        except Exception as e:
+                            st.sidebar.error(f"Error deleting {f.filename}")
+                    except Exception as e:
+                        st.sidebar.error(f"Error deleting {f.filename}")
     else:
         st.sidebar.info("No files in vector store yet.")
 except Exception as e:
