@@ -3,7 +3,7 @@ import openai
 import os
 
 # Set your OpenAI API key
-openai.api_key = os.getenv("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")
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Assistant and thread setup
 ASSISTANT_ID = "your-assistant-id-here"  # Replace with your assistant ID
