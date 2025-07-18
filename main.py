@@ -29,7 +29,7 @@ if persist_files:
             st.sidebar.warning(f"{file.name} is already in the vector store.")
         else:
             uploaded = openai.files.create(file=file, purpose="assistants")
-            current_files = openai.beta.assistants.retrieve(ASSISTANT_ID).file_ids or []
+            current_files = openai.beta.assistants.retrieve(ASSISTANT_ID).model_dump().get("file_ids", [])
             openai.beta.assistants.update(
                 assistant_id=ASSISTANT_ID,
                 file_ids=current_files + [uploaded.id]
