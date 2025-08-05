@@ -23,9 +23,10 @@ try:
     vector_files = openai.vector_stores.files.list(vector_store_id=VECTORSTORE_ID).data
     if vector_files:
         for f in vector_files:
-            timestamp = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
-            url = f"https://api.openai.com/v1/files/{f.id}/content"
-            st.sidebar.markdown(f"[{f.filename} — {timestamp}]({url})")
+            file = openai.files.retrieve(f.file_id)
+            timestamp = datetime.fromtimestamp(file.created_at).strftime("%Y-%m-%d %H:%M")
+            url = f"https://api.openai.com/v1/files/{file.id}/content"
+            st.sidebar.markdown(f"[{file.filename} — {timestamp}]({url})")
     else:
         st.sidebar.info("Vector store is empty.")
         st.sidebar.info("Assistant has no linked files.")
