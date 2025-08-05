@@ -20,18 +20,14 @@ if "thread_id" not in st.session_state:
 st.sidebar.markdown("---")
 st.sidebar.subheader("📄 Files in Vector Store")
 try:
-    assistant = openai.beta.assistants.retrieve(ASSISTANT_ID)
-    file_ids = assistant.model_dump().get("file_ids", [])
-    if file_ids:
-        for fid in file_ids:
-            try:
-                f = openai.files.retrieve(fid)
-                timestamp = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
-                url = f"https://api.openai.com/v1/files/{f.id}/content"
-                st.sidebar.markdown(f"[{f.filename} — {timestamp}]({url})")
-            except Exception as e:
-                st.sidebar.warning(f"File not found: {fid}")
+    vector_files = openai.beta.vector_stores.files.list(vector_store_id=VECTORSTORE_ID).data
+    if vector_files:
+        for f in vector_files:
+            timestamp = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
+            url = f"https://api.openai.com/v1/files/{f.id}/content"
+            st.sidebar.markdown(f"[{f.filename} — {timestamp}]({url})")
     else:
+        st.sidebar.info("Vector store is empty.")
         st.sidebar.info("Assistant has no linked files.")
 except Exception as e:
     st.sidebar.error(f"Error retrieving assistant files: {e}")
