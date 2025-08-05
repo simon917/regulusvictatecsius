@@ -64,7 +64,11 @@ if user_input:
     if file_ids:
         message_args["file_ids"] = file_ids
 
-    openai.beta.threads.messages.create(**message_args)
+    try:
+        openai.beta.threads.messages.create(**message_args)
+    except Exception as e:
+        st.error(f"Failed to send message: {e}")
+        st.stop()
     st.chat_message("user").markdown(user_input)
     st.session_state.messages.append({"role": "user", "content": user_input})
 
