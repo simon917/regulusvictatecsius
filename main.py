@@ -23,7 +23,7 @@ try:
     vector_files = openai.vector_stores.files.list(vector_store_id=VECTORSTORE_ID).data
     if vector_files:
         for f in vector_files:
-            file = openai.files.retrieve(f.file_id)
+            file = openai.files.retrieve(f.id)
             timestamp = datetime.fromtimestamp(file.created_at).strftime("%Y-%m-%d %H:%M")
             url = f"https://api.openai.com/v1/files/{file.id}/content"
             st.sidebar.markdown(f"[{file.filename} — {timestamp}]({url})")
