@@ -62,7 +62,9 @@ if user_input:
         "content": user_input
     }
     if file_ids:
-        message_args["file_ids"] = file_ids
+        message_args["attachments"] = [
+            {"file_id": fid, "tools": [{"type": "file_search"}]} for fid in file_ids
+        ]
 
     try:
         openai.beta.threads.messages.create(**message_args)
