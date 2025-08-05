@@ -16,46 +16,25 @@ if "thread_id" not in st.session_state:
     thread = openai.beta.threads.create()
     st.session_state.thread_id = thread.id
 
-# Vector store upload
-st.sidebar.header("📚 Add to Knowledge Base")
-persist_files = st.sidebar.file_uploader("Upload PDFs to vector store", type=["pdf"], accept_multiple_files=True)
-if persist_files:
-    for file in persist_files:
-        try:
-            uploaded = openai.files.create(file=file, purpose="assistants")
-            if "vector_file_ids" not in st.session_state:
-                st.session_state.vector_file_ids = []
-            st.session_state.vector_file_ids.append(uploaded.id)
-            st.sidebar.success(f"Uploaded: {file.name}")
-        except Exception as e:
-            st.sidebar.error(f"Upload failed: {e}")
-        except Exception as e:
-            st.sidebar.error(f"Upload failed: {e}")
-
 # List vector store files
 st.sidebar.markdown("---")
-st.sidebar.subheader("📄 Uploaded Files (Session)")
-if "vector_file_ids" in st.session_state and st.session_state.vector_file_ids:
-    for fid in st.session_state.vector_file_ids:
-        try:
-            f = openai.files.retrieve(fid)
-            col1, col2 = st.sidebar.columns([4, 1])
-            timestamp = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
-            url = f"https://api.openai.com/v1/files/{f.id}/content"
-            with col1:
-                st.markdown(f"[{f.filename} — {timestamp}]({url})")
-            with col2:
-                if st.button("🗑️", key=f"del_{f.id}"):
-                    if st.sidebar.checkbox(f"Confirm delete: {f.filename}", key=f"cfm_{f.id}"):
-                        try:
-                            openai.files.delete(f.id)
-                            st.session_state.vector_file_ids.remove(fid)
-                            st.experimental_rerun()
-                        except Exception as e:
-                            st.sidebar.error(f"Error deleting: {e}")
-        except Exception as e:
-            st.sidebar.warning(f"File not found: {fid}")
-else:
+st.sidebar.subheader("📄 Files in Vector Store")
+try:
+    assistant = openai.beta.assistants.retrieve(ASSISTANT_ID)
+    file_ids = assistant.model_dump().get("file_ids", [])
+    if file_ids:
+        for fid in file_ids:
+            try:
+                f = openai.files.retrieve(fid)
+                timestamp = datetime.fromtimestamp(f.created_at).strftime("%Y-%m-%d %H:%M")
+                url = f"https://api.openai.com/v1/files/{f.id}/content"
+                st.sidebar.markdown(f"[{f.filename} — {timestamp}]({url})")
+            except Exception as e:
+                st.sidebar.warning(f"File not found: {fid}")
+    else:
+        st.sidebar.info("Assistant has no linked files.")
+except Exception as e:
+    st.sidebar.error(f"Error retrieving assistant files: {e}")
     st.sidebar.info("No files uploaded in this session.")
 
 # Chat section
